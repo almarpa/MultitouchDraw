@@ -1,6 +1,5 @@
 package com.example.multitouchdraw;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import yuku.ambilwarna.AmbilWarnaDialog;
+
 
 public class MultitacticalDrawView extends View implements
         GestureDetector.OnGestureListener,
@@ -22,9 +23,9 @@ public class MultitacticalDrawView extends View implements
 
     // Generador de numeros aleatorios
     Random rdm = new Random();
-    // Almacena las propiedades graficas de dibujo de la linea
+    // Almacena las propiedades gráficas de dibujo de la línea
     Paint paint = new Paint();
-    // Almacenan la posicion inicial y final de la linea
+    // Almacenan la posición inicial y final de la línea
     float prevX, prevY, newX, newY;
     // HashMap para guardar los paths
     private HashMap<Integer, Path> mapPaths = new HashMap<Integer, Path>();
@@ -36,19 +37,20 @@ public class MultitacticalDrawView extends View implements
     private ArrayList<Integer> listColors = new ArrayList<>();
     // ArrayList with all stroke widths
     private ArrayList<Float> listStrokes = new ArrayList<>();
-    // Color
+    // Paint color
     private int color = Color.BLACK;
-    // Stroke
+    // Stroke width
     private float stroke = 4f;
-
+    // Application context
+    private Context context;
 
     public MultitacticalDrawView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
+        this.context = context;
+        // Initialize
         mDetector = new GestureDetector(context,this);
         mDetector.setOnDoubleTapListener(this);
 
-        // Establezco las propiedades graficas de dibujo de la linea
         paint.setColor(Color.BLACK);
         paint.setAntiAlias(true);
         paint.setStrokeWidth(stroke);
@@ -60,7 +62,7 @@ public class MultitacticalDrawView extends View implements
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // Se dibujan los paths que hay en el map
+        // Draw all paths
         for (int i = 0; i<listPaths.size(); i++){
             Path p = listPaths.get(i);
             int c = listColors.get(i);
@@ -106,7 +108,6 @@ public class MultitacticalDrawView extends View implements
                     listPaths.add(path);
                     listColors.add(color);
                     listStrokes.add(stroke);
-
                 }
 
                 this.invalidate();
@@ -120,57 +121,70 @@ public class MultitacticalDrawView extends View implements
         return true;
     }
 
+    /** Override methods OnDoubleTapListener **/
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
+        System.out.println("Single tap: Increase stroke width");
+        stroke= stroke+2f;
         return true;
     }
-
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         return false;
     }
-
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
-        System.out.println("Double tap: Decrease brush width");
-        stroke= stroke-4f;
-
+        System.out.println("Double tap: Decrease stroke width");
+        stroke= stroke-2f;
         return true;
     }
 
+    /** Override methods OnGestureListener **/
     @Override
     public boolean onDown(MotionEvent e) {
         return false;
     }
-
     @Override
     public void onShowPress(MotionEvent e) {
     }
-
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        System.out.println("Single tap up: Increase brush width");
-        stroke= stroke+4f;
-        return true;
+        return false;
     }
-
     @Override
     public void onLongPress(MotionEvent e) {
-        System.out.println("Long press: Changing color");
-        color = Color.rgb(rdm.nextInt(255), rdm.nextInt(255), rdm.nextInt(255));
+        System.out.println("Long press: Change color");
+        // Llamada al método para escoger el color
+        openColorPicker();
     }
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        System.out.println("Fling: Removing last line drawed");
-        listPaths.clear();
-        listColors.clear();
-        listStrokes.clear();
-        return true;
+        //System.out.println("Fling: Remove lines drawed");
+        //listPaths.clear();
+        //listColors.clear();
+        //listStrokes.clear();
+        return false;
     }
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         return false;
+    }
+
+    /** Show color picker **/
+    private void openColorPicker() {
+        AmbilWarnaDialog colorPicker = new AmbilWarnaDialog(context, color, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+            @Override
+            public void onCancel(AmbilWarnaDialog dialog) {
+
+            }
+
+            @Override
+            public void onOk(AmbilWarnaDialog dialog, int c) {
+                color = c;
+            }
+        });
+        colorPicker.show();
     }
 }
