@@ -12,7 +12,6 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
@@ -21,8 +20,6 @@ public class MultitacticalDrawView extends View implements
         GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener{
 
-    // Generador de numeros aleatorios
-    Random rdm = new Random();
     // Almacena las propiedades gráficas de dibujo de la línea
     Paint paint = new Paint();
     // Almacenan la posición inicial y final de la línea
